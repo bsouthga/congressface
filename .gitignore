@@ -2,3 +2,4 @@ python-env
 .vscode
 images
 cropped
+src/*.pyc
