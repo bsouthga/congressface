@@ -1,11 +1,12 @@
 import requests
 import json
 import time
+import os
 from datetime import datetime
 import numpy as np
 from bs4 import BeautifulSoup
 
-BASE_URL = "https://www.congress.gov/members"
+BASE_URL = "https://www.congress.gov"
 HEADERS = { "User-Agent": "Mozilla/5.0" }
 
 def get_attr(item, selector, attr):
@@ -39,11 +40,11 @@ def parse_list_item(item):
   }
 
 def scrape(page=1):
-  r = requests.get(BASE_URL, headers=HEADERS, params={
+  r = requests.get(BASE_URL + "/members", headers=HEADERS, params={
     "pageSize": 250,
     "page": page
   })
-  soup = BeautifulSoup(r.text, 'html.parser')
+  soup = BeautifulSoup(r.text, "html.parser")
   items = soup.select("ol.basic-search-results-lists > li.compact")
 
   return {
@@ -51,8 +52,10 @@ def scrape(page=1):
     "continue": (not soup.select(".next.off"))
   }
 
+
+
 def write_json(filename, data):
-  with open(filename, 'w') as outjson:
+  with open(filename, "w") as outjson:
     json.dump(data, outjson)
 
 def collect_congress():
@@ -61,7 +64,7 @@ def collect_congress():
   collect = True
 
   while collect:
-    print('collecting page {page}...'.format(page=page))
+    print("collecting page {page}...".format(page=page))
     result = scrape(page)
     data.extend(result["results"])
     collect = result["continue"]
@@ -73,5 +76,38 @@ def collect_congress():
     "date": datetime.now().replace(microsecond=0).isoformat()
   })
 
-if __name__ == '__main__':
+def save_image(url):
+  filename = url.split("/")[-1]
+  filepath = "images/" + filename
+
+  if os.path.exists(filepath):
+    return None
+
+  r = requests.get(BASE_URL + url)
+
+  if r.status_code == 200:
+      with open(filepath, "wb") as f:
+          f.write(r.content)
+
+def collect_images():
+  data_filepath = "data/congress.json"
+
+  if !os.path.exists(data_filepath):
+    print("no data file, run collect_congress() first")
+    return None
+
+  with open(data_filepath) as data_file:
+    data = json.load(data_file)
+    members = data["data"]
+    for member in members:
+      if member["image"] != "":
+        print(
+          "retrieving image for {name}...".format(
+            name=member["name"]
+          )
+        )
+        save_image(member["image"])
+
+if __name__ == "__main__":
   collect_congress()
+  collect_images()
