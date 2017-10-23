@@ -100,7 +100,7 @@ def collect_images():
       if member["image"] != "":
         print(
           "retrieving image for {name}...".format(
-          name=member["name"]
+            name=member["name"]
           )
         )
         save_image(member["image"])
