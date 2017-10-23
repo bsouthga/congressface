@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import os
+import cv2
 from datetime import datetime
 import numpy as np
 from bs4 import BeautifulSoup
@@ -92,7 +93,7 @@ def save_image(url):
 def collect_images():
   data_filepath = "data/congress.json"
 
-  if !os.path.exists(data_filepath):
+  if not os.path.exists(data_filepath):
     print("no data file, run collect_congress() first")
     return None
 
@@ -108,6 +109,31 @@ def collect_images():
         )
         save_image(member["image"])
 
+def crop_and_center(image):
+	facedata = "cvdata/haarcascade_frontalface_alt.xml"
+	cascade = cv2.CascadeClassifier(facedata)
+
+	img = cv2.imread("images/" + image)
+
+	minisize = (img.shape[1],img.shape[0])
+	miniframe = cv2.resize(img, minisize)
+
+	faces = cascade.detectMultiScale(miniframe)
+
+	for f in faces:
+		x, y, w, h = [ v for v in f ]
+		cv2.rectangle(img, (x,y), (x+w,y+h), (255,255,255))
+		sub_face = img[y:y+h, x:x+w]
+		res = cv2.resize(sub_face, (200, 200), interpolation = cv2.INTER_LINEAR)
+		return res
+
+	return None
+
+
+def average_face(filename, images):
+
+
 if __name__ == "__main__":
-  collect_congress()
-  collect_images()
+  # collect_congress()
+  # collect_images()
+	facecrop("111_rp_az_5_mitchell_harry_200.jpg")
