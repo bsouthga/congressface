@@ -8,7 +8,6 @@ facedata = "cvdata/haarcascade_frontalface_alt.xml"
 cascade = cv2.CascadeClassifier(facedata)
 
 def average_group(df, groupby):
-  df = prep_data()
   key = "-".join(groupby)
   for group, group_df in df.groupby(groupby):
     images = set(group_df['image'])
