@@ -64,7 +64,8 @@ def prep_data():
             "year": year,
             "image": image,
             "party": member["party"],
-            "wing": wing
+            "wing": wing,
+            "state": member["state"]
           })
 
   return pd.DataFrame(out)

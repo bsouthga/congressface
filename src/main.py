@@ -10,5 +10,11 @@ if __name__ == "__main__":
   # collect_images()
 
   df = prep_data()
-  average_group(df, ["party"])
+  df = df[df["party"].isin(["Democratic", "Republican"])]
+
+  # average_group(df, ["party"])
+  # average_group(df, ["party", "wing"])
+  # average_group(df, ["wing"])
   # average_group(df, ["year"])
+  average_group(df, ["state"])
+

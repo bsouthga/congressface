@@ -4,18 +4,21 @@ import json
 import numpy as np
 from data import prep_data
 
+facedata = "cvdata/haarcascade_frontalface_alt.xml"
+cascade = cv2.CascadeClassifier(facedata)
 
 def average_group(df, groupby):
   df = prep_data()
   key = "-".join(groupby)
   for group, group_df in df.groupby(groupby):
-    images = set(list(group_df['image']))
+    images = set(group_df['image'])
     n = len(images)
-    if n > 10:
+    if n > 1:
       print("generating image for group {group} ({n} images)...".format(
         group=group, n=n
       ))
-      generate_averages(key + '-' + group + '.png', images)
+      filename = key + "-" + ("-".join(map(str, group)) if type(group) == tuple else str(group))
+      generate_averages(filename.lower() + '.png', images)
 
 def generate_averages(filename, images):
   centered = []
@@ -28,9 +31,6 @@ def generate_averages(filename, images):
   cv2.imwrite("output/" + filename, average)
 
 def crop_and_center(image):
-  facedata = "cvdata/haarcascade_frontalface_alt.xml"
-  cascade = cv2.CascadeClassifier(facedata)
-
   img = cv2.imread("images/" + image, cv2.IMREAD_GRAYSCALE)
 
   if img is None:
