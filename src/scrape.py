@@ -4,6 +4,7 @@ import time
 import os
 from datetime import datetime
 from bs4 import BeautifulSoup
+from data import get_data
 
 BASE_URL = "https://www.congress.gov"
 HEADERS = { "User-Agent": "Mozilla/5.0" }
@@ -87,20 +88,13 @@ def save_image(url):
       f.write(r.content)
 
 def collect_images():
-  data_filepath = "data/congress.json"
-
-  if not os.path.exists(data_filepath):
-    print("no data file, run collect_congress() first")
-    return None
-
-  with open(data_filepath) as data_file:
-    data = json.load(data_file)
-    members = data["data"]
-    for member in members:
-      if member["image"] != "":
-        print(
-          "retrieving image for {name}...".format(
-            name=member["name"]
-          )
+  data = get_data()
+  members = data["data"]
+  for member in members:
+    if member["image"] != "":
+      print(
+        "retrieving image for {name}...".format(
+          name=member["name"]
         )
-        save_image(member["image"])
+      )
+      save_image(member["image"])
