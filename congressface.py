@@ -48,7 +48,7 @@ def scrape(page=1):
 
   return {
     "results": [parse_list_item(item) for item in items],
-    "done": not (not soup.select(".next.off"))
+    "continue": (not soup.select(".next.off"))
   }
 
 def write_json(filename, data):
@@ -64,7 +64,7 @@ def collect_congress():
     print('collecting page {page}...'.format(page=page))
     result = scrape(page)
     data.extend(result["results"])
-    collect = not result["done"]
+    collect = result["continue"]
     page += 1
     time.sleep(1)
 
